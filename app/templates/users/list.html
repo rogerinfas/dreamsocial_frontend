@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Usuarios{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Usuarios</h1>
+<a href="{{ url_for('users.create_user') }}" class="bg-green-500 text-white px-4 py-2 rounded">Crear Usuario</a>
+<ul class="mt-4">
+  {% for user in users %}
+    <li class="border p-2 my-2 bg-white shadow rounded">
+      <strong>{{ user.email }}</strong>
+      {% if user.profile %}
+        <p>{{ user.profile.firstName }} {{ user.profile.lastName }}</p>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

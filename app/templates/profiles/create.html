@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Crear Perfil{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Nuevo Perfil</h1>
+<form method="post" enctype="multipart/form-data" class="space-y-4">
+  <input name="firstName" placeholder="Nombre" required class="w-full p-2 border rounded" />
+  <input name="lastName" placeholder="Apellido" required class="w-full p-2 border rounded" />
+  <select name="userId" required class="w-full p-2 border rounded">
+    <option value="">Seleccionar usuario</option>
+    {% for user in users %}
+      <option value="{{ user.id }}">{{ user.email }}</option>
+    {% endfor %}
+  </select>
+  <input type="file" name="avatar" class="w-full p-2 border rounded" />
+  <button class="bg-indigo-600 text-white px-4 py-2 rounded">Crear Perfil</button>
+</form>
+{% endblock %}

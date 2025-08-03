@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Perfiles{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Lista de Perfiles</h1>
+<a href="{{ url_for('profiles.create_profile') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">Crear Perfil</a>
+
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+  {% for profile in profiles %}
+    <div class="bg-white p-4 rounded shadow">
+      {% if profile.avatar %}
+        <img src="http://localhost:3000/{{ profile.avatar }}" alt="avatar" class="w-24 h-24 rounded-full mx-auto">
+      {% endif %}
+      <h2 class="text-xl font-semibold text-center mt-2">{{ profile.firstName }} {{ profile.lastName }}</h2>
+      <p class="text-center text-sm text-gray-500 mt-1">{{ profile.user.email }}</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

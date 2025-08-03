@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}Inicio - DreamSocial{% endblock %}
+{% block content %}
+<div class="text-center mt-10">
+  <h1 class="text-4xl font-bold text-indigo-700">Bienvenido a DreamSocial</h1>
+  <p class="mt-4 text-lg text-gray-600">Gestiona usuarios y perfiles fácilmente</p>
+  <div class="mt-8 space-x-4">
+    <a href="{{ url_for('users.list_users') }}" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">Ver Usuarios</a>
+    <a href="{{ url_for('profiles.list_profiles') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">Ver Perfiles</a>
+  </div>
+</div>
+{% endblock %}

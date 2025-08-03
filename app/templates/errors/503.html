@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %}Servicio No Disponible{% endblock %}
+{% block content %}
+<div class="text-center mt-20">
+  <h1 class="text-4xl font-bold text-red-600">🚧 Servicio No Disponible</h1>
+  <p class="mt-4 text-lg text-gray-700">No se pudo conectar con el backend.</p>
+  <p class="mt-2 text-sm text-gray-500">{{ error }}</p>
+  <a href="/" class="inline-block mt-6 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">Volver al inicio</a>
+</div>
+{% endblock %}
