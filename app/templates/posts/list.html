@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block title %}Feed - DreamSocial{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+  <!-- Header del Feed -->
+  <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Feed de DreamSocial</h1>
+        <p class="text-gray-600 mt-1">Descubre lo que está pasando en tu comunidad</p>
+      </div>
+      {% if session.logged_in %}
+        <a href="{{ url_for('posts.create_post') }}" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition duration-200 flex items-center space-x-2">
+          <i class="fas fa-plus"></i>
+          <span>Crear Post</span>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Posts -->
+  {% if posts %}
+    <div class="space-y-6">
+      {% for post in posts %}
+        <article class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition duration-200">
+          <!-- Header del Post -->
+          <div class="p-6 pb-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+                  {% if post.author.profile and post.author.profile.avatar %}
+                    <img src="{{ url_for('static', filename='../uploads/avatars/' + post.author.profile.avatar.split('/')[-1]) }}" 
+                         alt="Avatar" class="w-10 h-10 rounded-full object-cover">
+                  {% else %}
+                    <i class="fas fa-user text-indigo-600"></i>
+                  {% endif %}
+                </div>
+                <div>
+                  <h3 class="font-semibold text-gray-900">
+                    {% if post.author.profile %}
+                      {{ post.author.profile.firstName }} {{ post.author.profile.lastName }}
+                    {% else %}
+                      {{ post.author.email.split('@')[0] }}
+                    {% endif %}
+                  </h3>
+                  <p class="text-sm text-gray-500">{{ post.createdAt | strftime('%d/%m/%Y a las %H:%M') }}</p>
+                </div>
+              </div>
+              
+              {% if session.logged_in and session.user.id == post.author.id %}
+                <div class="flex items-center space-x-2">
+                  <a href="{{ url_for('posts.edit_post', post_id=post.id) }}" 
+                     class="text-gray-400 hover:text-indigo-600 transition duration-200">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form method="post" action="{{ url_for('posts.delete_post', post_id=post.id) }}" 
+                        onsubmit="return confirm('¿Estás seguro de que quieres eliminar este post?')" class="inline">
+                    <button type="submit" class="text-gray-400 hover:text-red-600 transition duration-200">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Contenido del Post -->
+          <div class="px-6 pb-4">
+            <p class="text-gray-800 leading-relaxed">{{ post.content }}</p>
+          </div>
+
+          <!-- Imagen del Post -->
+          {% if post.image %}
+            <div class="px-6 pb-4">
+              <img src="{{ url_for('static', filename='../uploads/posts/' + post.image.split('/')[-1]) }}" 
+                   alt="Imagen del post" 
+                   class="w-full max-h-96 object-cover rounded-lg border border-gray-200">
+            </div>
+          {% endif %}
+
+          <!-- Acciones del Post -->
+          <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center space-x-6">
+                {% if session.logged_in %}
+                  <form method="post" action="{{ url_for('posts.like_post', post_id=post.id) }}" class="inline">
+                    <button type="submit" class="flex items-center space-x-2 text-gray-600 hover:text-red-500 transition duration-200">
+                      <i class="fas fa-heart"></i>
+                      <span>{{ post.likes }}</span>
+                    </button>
+                  </form>
+                {% else %}
+                  <div class="flex items-center space-x-2 text-gray-600">
+                    <i class="fas fa-heart"></i>
+                    <span>{{ post.likes }}</span>
+                  </div>
+                {% endif %}
+                
+                <a href="{{ url_for('posts.view_post', post_id=post.id) }}" 
+                   class="flex items-center space-x-2 text-gray-600 hover:text-indigo-600 transition duration-200">
+                  <i class="fas fa-comment"></i>
+                  <span>Ver detalles</span>
+                </a>
+              </div>
+              
+              <a href="{{ url_for('posts.user_posts', user_id=post.author.id) }}" 
+                 class="text-sm text-gray-500 hover:text-indigo-600 transition duration-200">
+                Ver más posts de este usuario
+              </a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <!-- Estado vacío -->
+    <div class="bg-white rounded-lg shadow-sm p-12 text-center">
+      <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-newspaper text-2xl text-gray-400"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">No hay posts aún</h3>
+      <p class="text-gray-600 mb-6">Sé el primero en compartir algo con la comunidad</p>
+      {% if session.logged_in %}
+        <a href="{{ url_for('posts.create_post') }}" 
+           class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition duration-200 inline-flex items-center space-x-2">
+          <i class="fas fa-plus"></i>
+          <span>Crear mi primer post</span>
+        </a>
+      {% else %}
+        <a href="{{ url_for('auth.register') }}" 
+           class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition duration-200 inline-flex items-center space-x-2">
+          <i class="fas fa-user-plus"></i>
+          <span>Únete a DreamSocial</span>
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+<!-- Filtro personalizado para fechas -->
+{% set strftime = moment %}
+<script>
+// Función para formatear fechas de manera más amigable
+document.addEventListener('DOMContentLoaded', function() {
+  const timeElements = document.querySelectorAll('[data-time]');
+  timeElements.forEach(function(element) {
+    const time = new Date(element.getAttribute('data-time'));
+    const now = new Date();
+    const diff = now - time;
+    
+    if (diff < 60000) { // menos de 1 minuto
+      element.textContent = 'hace un momento';
+    } else if (diff < 3600000) { // menos de 1 hora
+      const minutes = Math.floor(diff / 60000);
+      element.textContent = `hace ${minutes} minuto${minutes > 1 ? 's' : ''}`;
+    } else if (diff < 86400000) { // menos de 1 día
+      const hours = Math.floor(diff / 3600000);
+      element.textContent = `hace ${hours} hora${hours > 1 ? 's' : ''}`;
+    }
+  });
+});
+</script>
+{% endblock %}

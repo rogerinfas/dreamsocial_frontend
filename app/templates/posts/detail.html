@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% block title %}Post - DreamSocial{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto">
+  <!-- Botón de regreso -->
+  <div class="mb-6">
+    <a href="{{ url_for('posts.list_posts') }}" 
+       class="text-gray-600 hover:text-indigo-600 transition duration-200 flex items-center space-x-2">
+      <i class="fas fa-arrow-left"></i>
+      <span>Volver al feed</span>
+    </a>
+  </div>
+
+  <!-- Post Detail -->
+  <article class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <!-- Header del Post -->
+    <div class="p-6 pb-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
+            {% if post.author.profile and post.author.profile.avatar %}
+              <img src="{{ url_for('static', filename='../uploads/avatars/' + post.author.profile.avatar.split('/')[-1]) }}" 
+                   alt="Avatar" class="w-12 h-12 rounded-full object-cover">
+            {% else %}
+              <i class="fas fa-user text-indigo-600 text-lg"></i>
+            {% endif %}
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900">
+              {% if post.author.profile %}
+                {{ post.author.profile.firstName }} {{ post.author.profile.lastName }}
+              {% else %}
+                {{ post.author.email.split('@')[0] }}
+              {% endif %}
+            </h2>
+            <p class="text-sm text-gray-500">
+              {{ post.createdAt | strftime('%d de %B de %Y a las %H:%M') }}
+            </p>
+          </div>
+        </div>
+        
+        {% if session.logged_in and session.user.id == post.author.id %}
+          <div class="flex items-center space-x-3">
+            <a href="{{ url_for('posts.edit_post', post_id=post.id) }}" 
+               class="text-gray-400 hover:text-indigo-600 transition duration-200 p-2">
+              <i class="fas fa-edit"></i>
+            </a>
+            <form method="post" action="{{ url_for('posts.delete_post', post_id=post.id) }}" 
+                  onsubmit="return confirm('¿Estás seguro de que quieres eliminar este post?')" class="inline">
+              <button type="submit" class="text-gray-400 hover:text-red-600 transition duration-200 p-2">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Contenido del Post -->
+    <div class="px-6 pb-6">
+      <div class="prose max-w-none">
+        <p class="text-gray-800 text-lg leading-relaxed whitespace-pre-wrap">{{ post.content }}</p>
+      </div>
+    </div>
+
+    <!-- Imagen del Post -->
+    {% if post.image %}
+      <div class="px-6 pb-6">
+        <img src="{{ url_for('static', filename='../uploads/posts/' + post.image.split('/')[-1]) }}" 
+             alt="Imagen del post" 
+             class="w-full max-h-96 object-cover rounded-lg border border-gray-200">
+      </div>
+    {% endif %}
+
+    <!-- Estadísticas y Acciones -->
+    <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-6">
+          {% if session.logged_in %}
+            <div class="flex items-center space-x-4">
+              <form method="post" action="{{ url_for('posts.like_post', post_id=post.id) }}" class="inline">
+                <button type="submit" class="flex items-center space-x-2 text-gray-600 hover:text-red-500 transition duration-200 px-3 py-2 rounded-lg hover:bg-red-50">
+                  <i class="fas fa-heart"></i>
+                  <span>Me gusta ({{ post.likes }})</span>
+                </button>
+              </form>
+              
+              {% if post.likes > 0 %}
+                <form method="post" action="{{ url_for('posts.unlike_post', post_id=post.id) }}" class="inline">
+                  <button type="submit" class="text-sm text-gray-500 hover:text-gray-700 transition duration-200">
+                    Quitar like
+                  </button>
+                </form>
+              {% endif %}
+            </div>
+          {% else %}
+            <div class="flex items-center space-x-2 text-gray-600">
+              <i class="fas fa-heart"></i>
+              <span>{{ post.likes }} likes</span>
+            </div>
+          {% endif %}
+        </div>
+        
+        <div class="flex items-center space-x-4 text-sm text-gray-500">
+          <span>
+            <i class="fas fa-eye mr-1"></i>
+            Publicado {{ post.createdAt | strftime('%d/%m/%Y') }}
+          </span>
+          {% if post.updatedAt != post.createdAt %}
+            <span>
+              <i class="fas fa-edit mr-1"></i>
+              Editado {{ post.updatedAt | strftime('%d/%m/%Y') }}
+            </span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- Información del Autor -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">Sobre el autor</h3>
+    <div class="flex items-center space-x-4">
+      <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
+        {% if post.author.profile and post.author.profile.avatar %}
+          <img src="{{ url_for('static', filename='../uploads/avatars/' + post.author.profile.avatar.split('/')[-1]) }}" 
+               alt="Avatar" class="w-16 h-16 rounded-full object-cover">
+        {% else %}
+          <i class="fas fa-user text-indigo-600 text-xl"></i>
+        {% endif %}
+      </div>
+      <div class="flex-1">
+        <h4 class="font-semibold text-gray-900">
+          {% if post.author.profile %}
+            {{ post.author.profile.firstName }} {{ post.author.profile.lastName }}
+          {% else %}
+            {{ post.author.email.split('@')[0] }}
+          {% endif %}
+        </h4>
+        <p class="text-gray-600">Miembro desde {{ post.author.createdAt | strftime('%B de %Y') }}</p>
+        <div class="mt-2">
+          <a href="{{ url_for('posts.user_posts', user_id=post.author.id) }}" 
+             class="text-indigo-600 hover:text-indigo-800 transition duration-200 text-sm font-medium">
+            Ver todos los posts de este usuario →
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Posts Relacionados -->
+  <div class="mt-8">
+    <h3 class="text-xl font-semibold text-gray-900 mb-4">Más posts que te pueden interesar</h3>
+    <div class="text-center py-8 text-gray-500">
+      <i class="fas fa-newspaper text-3xl mb-2"></i>
+      <p>Funcionalidad de posts relacionados próximamente</p>
+      <a href="{{ url_for('posts.list_posts') }}" 
+         class="text-indigo-600 hover:text-indigo-800 transition duration-200 font-medium">
+        Ver todos los posts
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

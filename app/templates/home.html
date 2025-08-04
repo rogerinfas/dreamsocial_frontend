@@ -1,12 +1,197 @@
 {% extends 'base.html' %}
 {% block title %}Inicio - DreamSocial{% endblock %}
 {% block content %}
-<div class="text-center mt-10">
-  <h1 class="text-4xl font-bold text-indigo-700">Bienvenido a DreamSocial</h1>
-  <p class="mt-4 text-lg text-gray-600">Gestiona usuarios y perfiles fácilmente</p>
-  <div class="mt-8 space-x-4">
-    <a href="{{ url_for('users.list_users') }}" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500">Ver Usuarios</a>
-    <a href="{{ url_for('profiles.list_profiles') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500">Ver Perfiles</a>
+<div class="max-w-6xl mx-auto">
+  <!-- Hero Section -->
+  <div class="text-center py-12 mb-12">
+    <div class="max-w-3xl mx-auto">
+      <h1 class="text-5xl font-bold text-gray-900 mb-6">
+        Bienvenido a <span class="text-indigo-600">DreamSocial</span>
+      </h1>
+      <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+        La red social donde puedes compartir tus sueños, conectar con personas increíbles 
+        y construir una comunidad auténtica.
+      </p>
+      
+      {% if not session.logged_in %}
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="{{ url_for('auth.register') }}" 
+             class="bg-indigo-600 text-white px-8 py-4 rounded-lg hover:bg-indigo-700 transition duration-200 font-semibold text-lg flex items-center justify-center space-x-2">
+            <i class="fas fa-user-plus"></i>
+            <span>Únete Gratis</span>
+          </a>
+          <a href="{{ url_for('auth.login') }}" 
+             class="border-2 border-indigo-600 text-indigo-600 px-8 py-4 rounded-lg hover:bg-indigo-50 transition duration-200 font-semibold text-lg flex items-center justify-center space-x-2">
+            <i class="fas fa-sign-in-alt"></i>
+            <span>Iniciar Sesión</span>
+          </a>
+        </div>
+      {% else %}
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a href="{{ url_for('posts.list_posts') }}" 
+             class="bg-indigo-600 text-white px-8 py-4 rounded-lg hover:bg-indigo-700 transition duration-200 font-semibold text-lg flex items-center justify-center space-x-2">
+            <i class="fas fa-home"></i>
+            <span>Ver Feed</span>
+          </a>
+          <a href="{{ url_for('posts.create_post') }}" 
+             class="border-2 border-indigo-600 text-indigo-600 px-8 py-4 rounded-lg hover:bg-indigo-50 transition duration-200 font-semibold text-lg flex items-center justify-center space-x-2">
+            <i class="fas fa-plus"></i>
+            <span>Crear Post</span>
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Features Section -->
+  <div class="grid md:grid-cols-3 gap-8 mb-12">
+    <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center hover:shadow-md transition duration-200">
+      <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-heart text-2xl text-indigo-600"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-900 mb-3">Comparte tus Sueños</h3>
+      <p class="text-gray-600">
+        Publica tus pensamientos, experiencias y sueños con una comunidad que te entiende.
+      </p>
+    </div>
+
+    <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center hover:shadow-md transition duration-200">
+      <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-users text-2xl text-green-600"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-900 mb-3">Conecta con Personas</h3>
+      <p class="text-gray-600">
+        Conoce personas increíbles, forma amistades auténticas y construye tu red social.
+      </p>
+    </div>
+
+    <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center hover:shadow-md transition duration-200">
+      <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class="fas fa-star text-2xl text-purple-600"></i>
+      </div>
+      <h3 class="text-xl font-semibold text-gray-900 mb-3">Inspírate Diariamente</h3>
+      <p class="text-gray-600">
+        Descubre historias inspiradoras y contenido que te motive a alcanzar tus metas.
+      </p>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white mb-12">
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold mb-2">DreamSocial en Números</h2>
+      <p class="text-indigo-100">Una comunidad en crecimiento</p>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div>
+        <div class="text-3xl font-bold mb-1">1K+</div>
+        <div class="text-indigo-100 text-sm">Usuarios Activos</div>
+      </div>
+      <div>
+        <div class="text-3xl font-bold mb-1">5K+</div>
+        <div class="text-indigo-100 text-sm">Posts Compartidos</div>
+      </div>
+      <div>
+        <div class="text-3xl font-bold mb-1">15K+</div>
+        <div class="text-indigo-100 text-sm">Likes Dados</div>
+      </div>
+      <div>
+        <div class="text-3xl font-bold mb-1">24/7</div>
+        <div class="text-indigo-100 text-sm">Comunidad Activa</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity Preview -->
+  {% if not session.logged_in %}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+      <div class="text-center mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Únete a la Conversación</h2>
+        <p class="text-gray-600">Mira lo que está pasando en DreamSocial</p>
+      </div>
+      
+      <!-- Sample Posts Preview -->
+      <div class="space-y-6 max-w-2xl mx-auto">
+        <div class="border border-gray-200 rounded-lg p-6 bg-gray-50">
+          <div class="flex items-center space-x-3 mb-4">
+            <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-user text-indigo-600"></i>
+            </div>
+            <div>
+              <div class="font-semibold text-gray-900">María González</div>
+              <div class="text-sm text-gray-500">hace 2 horas</div>
+            </div>
+          </div>
+          <p class="text-gray-700 mb-3">
+            ¡Acabo de terminar mi primer maratón! 🏃‍♀️ Nunca pensé que podría hacerlo, 
+            pero con determinación todo es posible. ¡Gracias por todo el apoyo!
+          </p>
+          <div class="flex items-center space-x-4 text-sm text-gray-500">
+            <span><i class="fas fa-heart text-red-500 mr-1"></i>24 likes</span>
+            <span><i class="fas fa-comment mr-1"></i>8 comentarios</span>
+          </div>
+        </div>
+
+        <div class="border border-gray-200 rounded-lg p-6 bg-gray-50">
+          <div class="flex items-center space-x-3 mb-4">
+            <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-user text-green-600"></i>
+            </div>
+            <div>
+              <div class="font-semibold text-gray-900">Carlos Ruiz</div>
+              <div class="text-sm text-gray-500">hace 5 horas</div>
+            </div>
+          </div>
+          <p class="text-gray-700 mb-3">
+            Compartiendo mi nueva receta de pizza casera 🍕 ¡Perfecta para el fin de semana! 
+            ¿Quién se anima a probarla?
+          </p>
+          <div class="flex items-center space-x-4 text-sm text-gray-500">
+            <span><i class="fas fa-heart text-red-500 mr-1"></i>18 likes</span>
+            <span><i class="fas fa-comment mr-1"></i>12 comentarios</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-8">
+        <a href="{{ url_for('auth.register') }}" 
+           class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition duration-200 font-medium">
+          Únete para ver más
+        </a>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Call to Action -->
+  <div class="text-center py-12">
+    <h2 class="text-3xl font-bold text-gray-900 mb-4">
+      ¿Listo para comenzar tu viaje?
+    </h2>
+    <p class="text-xl text-gray-600 mb-8">
+      Únete a miles de personas que ya están compartiendo sus historias en DreamSocial
+    </p>
+    
+    {% if not session.logged_in %}
+      <a href="{{ url_for('auth.register') }}" 
+         class="bg-indigo-600 text-white px-8 py-4 rounded-lg hover:bg-indigo-700 transition duration-200 font-semibold text-lg inline-flex items-center space-x-2">
+        <i class="fas fa-rocket"></i>
+        <span>Comenzar Ahora</span>
+      </a>
+    {% else %}
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="{{ url_for('posts.create_post') }}" 
+           class="bg-indigo-600 text-white px-8 py-4 rounded-lg hover:bg-indigo-700 transition duration-200 font-semibold text-lg inline-flex items-center space-x-2">
+          <i class="fas fa-plus"></i>
+          <span>Crear tu Primer Post</span>
+        </a>
+        <a href="{{ url_for('users.list_users') }}" 
+           class="border-2 border-indigo-600 text-indigo-600 px-8 py-4 rounded-lg hover:bg-indigo-50 transition duration-200 font-semibold text-lg inline-flex items-center space-x-2">
+          <i class="fas fa-users"></i>
+          <span>Explorar Usuarios</span>
+        </a>
+      </div>
+    {% endif %}
   </div>
 </div>
 {% endblock %}
