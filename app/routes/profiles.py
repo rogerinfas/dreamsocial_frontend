@@ -63,3 +63,22 @@ def create_profile():
 
     users = users_resp.json() if users_resp.status_code == 200 else []
     return render_template('profiles/create.html', users=users)
+
+@bp.route('/<int:profile_id>')
+@login_required
+def view_profile(profile_id):
+    headers = get_auth_headers()
+    
+    # Fetch profile data
+    profile_resp = requests.get(f"{current_app.config['API_URL']}/profiles/{profile_id}", headers=headers)
+    if profile_resp.status_code != 200:
+        flash('Perfil no encontrado.', 'error')
+        return redirect(url_for('home.index'))
+    
+    profile = profile_resp.json()
+    
+    # Fetch user's posts
+    posts_resp = requests.get(f"{current_app.config['API_URL']}/posts/user/{profile['user']['id']}", headers=headers)
+    posts = posts_resp.json() if posts_resp.status_code == 200 else []
+    
+    return render_template('profile/detail.html', profile=profile, posts=posts)
