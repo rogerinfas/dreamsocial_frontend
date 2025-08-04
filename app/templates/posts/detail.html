@@ -19,7 +19,7 @@
         <div class="flex items-center space-x-4">
           <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
             {% if post.author.profile and post.author.profile.avatar %}
-              <img src="{{ url_for('static', filename='../uploads/avatars/' + post.author.profile.avatar.split('/')[-1]) }}" 
+              <img src="{{ current_app.config['API_URL'] }}/{{ post.author.profile.avatar }}"
                    alt="Avatar" class="w-12 h-12 rounded-full object-cover">
             {% else %}
               <i class="fas fa-user text-indigo-600 text-lg"></i>
@@ -66,8 +66,8 @@
     <!-- Imagen del Post -->
     {% if post.image %}
       <div class="px-6 pb-6">
-        <img src="{{ url_for('static', filename='../uploads/posts/' + post.image.split('/')[-1]) }}" 
-             alt="Imagen del post" 
+        <img src="{{ current_app.config['API_URL'] }}/{{ post.image }}"
+             alt="Imagen del post"
              class="w-full max-h-96 object-cover rounded-lg border border-gray-200">
       </div>
     {% endif %}
@@ -123,7 +123,7 @@
     <div class="flex items-center space-x-4">
       <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
         {% if post.author.profile and post.author.profile.avatar %}
-          <img src="{{ url_for('static', filename='../uploads/avatars/' + post.author.profile.avatar.split('/')[-1]) }}" 
+          <img src="{{ current_app.config['API_URL'] }}/{{ post.author.profile.avatar }}"
                alt="Avatar" class="w-16 h-16 rounded-full object-cover">
         {% else %}
           <i class="fas fa-user text-indigo-600 text-xl"></i>
