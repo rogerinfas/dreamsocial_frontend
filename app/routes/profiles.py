@@ -1,15 +1,24 @@
-from flask import Blueprint, render_template, request, redirect, url_for, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, current_app, flash
 import requests
+from .auth import get_auth_headers, login_required
 
 bp = Blueprint('profiles', __name__, url_prefix='/profiles')
 
 @bp.route('/')
+@login_required
 def list_profiles():
-    resp = requests.get(f"{current_app.config['API_URL']}/profiles")
+    headers = get_auth_headers()
+    resp = requests.get(f"{current_app.config['API_URL']}/profiles", headers=headers)
+
+    if resp.status_code == 401:
+        flash('Tu sesión ha expirado, por favor inicia sesión de nuevo.', 'error')
+        return redirect(url_for('auth.logout'))
+
     profiles = resp.json() if resp.status_code == 200 else []
     return render_template('profiles/list.html', profiles=profiles)
 
 @bp.route('/create', methods=['GET', 'POST'])
+@login_required
 def create_profile():
     if request.method == 'POST':
         first_name = request.form.get('firstName')
@@ -28,10 +37,15 @@ def create_profile():
             avatar = request.files['avatar']
             files['avatar'] = (avatar.filename, avatar.stream, avatar.mimetype)
 
+        headers = get_auth_headers()
+        # Remove content-type from headers for multipart/form-data
+        headers.pop('Content-Type', None)
+
         response = requests.post(
             f"{current_app.config['API_URL']}/profiles",
             data=form_data,
-            files=files
+            files=files,
+            headers=headers
         )
 
         if response.status_code == 201:
@@ -40,5 +54,12 @@ def create_profile():
             print('[ERROR RESPUETA]:', response.status_code, response.text)
             return f"Error al crear perfil: {response.status_code} - {response.text}", 400
 
-    users = requests.get(f"{current_app.config['API_URL']}/users").json()
+    headers = get_auth_headers()
+    users_resp = requests.get(f"{current_app.config['API_URL']}/users", headers=headers)
+    
+    if users_resp.status_code == 401:
+        flash('Tu sesión ha expirado, por favor inicia sesión de nuevo.', 'error')
+        return redirect(url_for('auth.logout'))
+
+    users = users_resp.json() if users_resp.status_code == 200 else []
     return render_template('profiles/create.html', users=users)

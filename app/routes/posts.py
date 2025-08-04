@@ -5,9 +5,16 @@ from .auth import login_required, get_auth_headers
 bp = Blueprint('posts', __name__, url_prefix='/posts')
 
 @bp.route('/')
+@login_required
 def list_posts():
     try:
-        response = requests.get(f"{current_app.config['API_URL']}/posts")
+        headers = get_auth_headers()
+        response = requests.get(f"{current_app.config['API_URL']}/posts", headers=headers)
+
+        if response.status_code == 401:
+            flash('Tu sesión ha expirado, por favor inicia sesión de nuevo.', 'error')
+            return redirect(url_for('auth.logout'))
+
         posts = response.json() if response.status_code == 200 else []
         return render_template('posts/list.html', posts=posts)
     except requests.exceptions.RequestException:
@@ -53,9 +60,16 @@ def create_post():
     return render_template('posts/create.html')
 
 @bp.route('/<int:post_id>')
+@login_required
 def view_post(post_id):
     try:
-        response = requests.get(f"{current_app.config['API_URL']}/posts/{post_id}")
+        headers = get_auth_headers()
+        response = requests.get(f"{current_app.config['API_URL']}/posts/{post_id}", headers=headers)
+
+        if response.status_code == 401:
+            flash('Tu sesión ha expirado, por favor inicia sesión de nuevo.', 'error')
+            return redirect(url_for('auth.logout'))
+
         if response.status_code == 200:
             post = response.json()
             return render_template('posts/detail.html', post=post)
@@ -105,13 +119,20 @@ def unlike_post(post_id):
     return redirect(url_for('posts.view_post', post_id=post_id))
 
 @bp.route('/user/<int:user_id>')
+@login_required
 def user_posts(user_id):
     try:
-        response = requests.get(f"{current_app.config['API_URL']}/posts/user/{user_id}")
+        headers = get_auth_headers()
+        response = requests.get(f"{current_app.config['API_URL']}/posts/user/{user_id}", headers=headers)
+
+        if response.status_code == 401:
+            flash('Tu sesión ha expirado, por favor inicia sesión de nuevo.', 'error')
+            return redirect(url_for('auth.logout'))
+
         posts = response.json() if response.status_code == 200 else []
         
         # Obtener información del usuario
-        user_response = requests.get(f"{current_app.config['API_URL']}/users/{user_id}")
+        user_response = requests.get(f"{current_app.config['API_URL']}/users/{user_id}", headers=headers)
         user = user_response.json() if user_response.status_code == 200 else None
         
         return render_template('posts/user_posts.html', posts=posts, user=user)
@@ -124,7 +145,13 @@ def user_posts(user_id):
 def edit_post(post_id):
     # Primero obtener el post para verificar que el usuario es el autor
     try:
-        response = requests.get(f"{current_app.config['API_URL']}/posts/{post_id}")
+        headers = get_auth_headers()
+        response = requests.get(f"{current_app.config['API_URL']}/posts/{post_id}", headers=headers)
+
+        if response.status_code == 401:
+            flash('Tu sesión ha expirado, por favor inicia sesión de nuevo.', 'error')
+            return redirect(url_for('auth.logout'))
+
         if response.status_code != 200:
             flash('Post no encontrado', 'error')
             return redirect(url_for('posts.list_posts'))
