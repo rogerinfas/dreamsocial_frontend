@@ -6,45 +6,72 @@
   <title>{% block title %}DreamSocial{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
+      color: #4B5563; /* gray-600 */
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .nav-link:hover {
+      background-color: #F3F4F6; /* gray-100 */
+      color: #4F46E5; /* indigo-600 */
+    }
+    .nav-link.active {
+      background-color: #EEF2FF; /* indigo-100 */
+      color: #4338CA; /* indigo-700 */
+      font-weight: 600;
+    }
+    .dropdown-link {
+      display: block;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      color: #374151; /* gray-700 */
+      transition: background-color 0.2s;
+    }
+    .dropdown-link:hover {
+      background-color: #F3F4F6; /* gray-100 */
+    }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-900 min-h-screen">
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col pt-16">
   <!-- Navigation -->
-  <nav class="bg-white shadow-lg border-b border-gray-200 sticky top-0 z-50">
+  <nav class="bg-white shadow-md fixed top-0 left-0 right-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         <!-- Logo -->
         <div class="flex items-center">
           <a href="{{ url_for('home.index') }}" class="flex items-center space-x-2">
-            <i class="fas fa-heart text-2xl text-indigo-600"></i>
-            <span class="text-xl font-bold text-indigo-700">DreamSocial</span>
+            <i class="fas fa-heart text-3xl text-indigo-600"></i>
+            <span class="text-2xl font-bold text-gray-800">DreamSocial</span>
           </a>
         </div>
 
         <!-- Navigation Links -->
-        <div class="hidden md:flex items-center space-x-6">
-          <a href="{{ url_for('posts.list_posts') }}" class="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition duration-200">
+        <div class="hidden md:flex items-center space-x-2">
+          <a href="{{ url_for('posts.list_posts') }}" class="nav-link {% if request.endpoint == 'posts.list_posts' %}active{% endif %}">
             <i class="fas fa-home"></i>
             <span>Feed</span>
           </a>
-          
           {% if session.logged_in %}
-            <a href="{{ url_for('posts.create_post') }}" class="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition duration-200">
+            <a href="{{ url_for('posts.create_post') }}" class="nav-link {% if request.endpoint == 'posts.create_post' %}active{% endif %}">
               <i class="fas fa-plus-circle"></i>
               <span>Crear Post</span>
             </a>
-            
             {% if session.user.role == 'admin' %}
-            <a href="{{ url_for('users.list_users') }}" class="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition duration-200">
+            <a href="{{ url_for('users.list_users') }}" class="nav-link {% if request.endpoint == 'users.list_users' %}active{% endif %}">
               <i class="fas fa-users"></i>
               <span>Usuarios</span>
             </a>
-            
-            <a href="{{ url_for('profiles.list_profiles') }}" class="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition duration-200">
+            <a href="{{ url_for('profiles.list_profiles') }}" class="nav-link {% if request.endpoint == 'profiles.list_profiles' %}active{% endif %}">
               <i class="fas fa-user-friends"></i>
               <span>Perfiles</span>
             </a>
-
-            <a href="{{ url_for('home.admin_dashboard') }}" class="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition duration-200">
+            <a href="{{ url_for('home.admin_dashboard') }}" class="nav-link {% if request.endpoint == 'home.admin_dashboard' %}active{% endif %}">
               <i class="fas fa-tachometer-alt"></i>
               <span>Admin</span>
             </a>
@@ -55,33 +82,30 @@
         <!-- User Menu -->
         <div class="flex items-center space-x-4">
           {% if session.logged_in %}
-            <div class="flex items-center space-x-3">
-              <span class="text-sm text-gray-600">Hola, {{ session.user.email.split('@')[0] }}</span>
-              <div class="relative group">
-                <button class="flex items-center space-x-1 text-gray-700 hover:text-indigo-600 transition duration-200">
-                  <i class="fas fa-user-circle text-xl"></i>
-                  <i class="fas fa-chevron-down text-xs"></i>
-                </button>
-                <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  <a href="{{ url_for('posts.user_posts', user_id=session.user.id) }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    <i class="fas fa-user mr-2"></i>Mi Perfil
-                  </a>
-                  <a href="{{ url_for('profiles.create_profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    <i class="fas fa-edit mr-2"></i>Editar Perfil
-                  </a>
-                  <div class="border-t border-gray-100"></div>
-                  <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                    <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
-                  </a>
-                </div>
+            <div class="relative group">
+              <button class="flex items-center space-x-2 text-gray-700 hover:text-indigo-600 transition duration-200 p-2 rounded-md">
+                <span class="text-sm font-medium">Hola, {{ session.user.email.split('@')[0] }}</span>
+                <i class="fas fa-chevron-down text-xs transition-transform duration-200 group-hover:rotate-180"></i>
+              </button>
+              <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                <a href="{{ url_for('posts.user_posts', user_id=session.user.id) }}" class="dropdown-link">
+                  <i class="fas fa-user w-4 mr-2"></i>Mi Perfil
+                </a>
+                <a href="{{ url_for('profiles.create_profile') }}" class="dropdown-link">
+                  <i class="fas fa-edit w-4 mr-2"></i>Editar Perfil
+                </a>
+                <div class="border-t border-gray-200 my-1"></div>
+                <a href="{{ url_for('auth.logout') }}" class="dropdown-link text-red-600 hover:bg-red-50">
+                  <i class="fas fa-sign-out-alt w-4 mr-2"></i>Cerrar Sesión
+                </a>
               </div>
             </div>
           {% else %}
             <div class="flex items-center space-x-3">
-              <a href="{{ url_for('auth.login') }}" class="text-gray-700 hover:text-indigo-600 transition duration-200">
+              <a href="{{ url_for('auth.login') }}" class="text-gray-600 hover:text-indigo-600 font-medium transition duration-200">
                 Iniciar Sesión
               </a>
-              <a href="{{ url_for('auth.register') }}" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition duration-200">
+              <a href="{{ url_for('auth.register') }}" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 font-medium transition duration-200">
                 Registrarse
               </a>
             </div>
@@ -103,7 +127,6 @@
         <a href="{{ url_for('posts.list_posts') }}" class="block px-3 py-2 text-gray-700 hover:text-indigo-600">
           <i class="fas fa-home mr-2"></i>Feed
         </a>
-        
         {% if session.logged_in %}
           <a href="{{ url_for('posts.create_post') }}" class="block px-3 py-2 text-gray-700 hover:text-indigo-600">
             <i class="fas fa-plus-circle mr-2"></i>Crear Post
@@ -138,31 +161,25 @@
     </div>
   </nav>
 
-  <!-- Flash Messages -->
+  <!-- Data Island for Flashed Messages -->
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-        {% for category, message in messages %}
-          <div class="mb-4 p-4 rounded-md {% if category == 'error' %}bg-red-100 text-red-700 border border-red-300{% elif category == 'success' %}bg-green-100 text-green-700 border border-green-300{% else %}bg-blue-100 text-blue-700 border border-blue-300{% endif %}">
-            <div class="flex items-center">
-              <i class="fas {% if category == 'error' %}fa-exclamation-circle{% elif category == 'success' %}fa-check-circle{% else %}fa-info-circle{% endif %} mr-2"></i>
-              {{ message }}
-            </div>
-          </div>
-        {% endfor %}
-      </div>
+      <div id="flash-messages" data-messages='{{ messages | tojson | safe }}' class="hidden"></div>
     {% endif %}
   {% endwith %}
 
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-20 right-5 z-50 space-y-3 w-full max-w-xs"></div>
+
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow">
     {% block content %}{% endblock %}
   </main>
 
   <!-- Footer -->
-  <footer class="bg-white border-t border-gray-200 mt-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div class="text-center text-gray-600">
+  <footer class="bg-white border-t border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="text-center text-gray-500 text-sm">
         <p>&copy; 2024 DreamSocial. Una red social para compartir tus sueños.</p>
       </div>
     </div>
@@ -171,21 +188,75 @@
   <script>
     // Mobile menu toggle
     document.getElementById('mobile-menu-button').addEventListener('click', function() {
-      const mobileMenu = document.getElementById('mobile-menu');
-      mobileMenu.classList.toggle('hidden');
+      document.getElementById('mobile-menu').classList.toggle('hidden');
     });
 
-    // Auto-hide flash messages after 5 seconds
-    setTimeout(function() {
-      const flashMessages = document.querySelectorAll('[class*="bg-red-100"], [class*="bg-green-100"], [class*="bg-blue-100"]');
-      flashMessages.forEach(function(message) {
-        message.style.transition = 'opacity 0.5s';
-        message.style.opacity = '0';
-        setTimeout(function() {
-          message.remove();
-        }, 500);
-      });
-    }, 5000);
+    // Toast notification logic
+    document.addEventListener('DOMContentLoaded', function() {
+      const toastContainer = document.getElementById('toast-container');
+      const flashMessagesDiv = document.getElementById('flash-messages');
+
+      if (flashMessagesDiv) {
+        const messages = JSON.parse(flashMessagesDiv.getAttribute('data-messages'));
+        messages.forEach(([category, message]) => {
+          createToast(message, category);
+        });
+      }
+
+      function createToast(message, category) {
+        const toast = document.createElement('div');
+        let bgColor, textColor, iconClass;
+
+        switch(category) {
+          case 'success':
+            bgColor = 'bg-green-500';
+            textColor = 'text-white';
+            iconClass = 'fas fa-check-circle';
+            break;
+          case 'error':
+            bgColor = 'bg-red-500';
+            textColor = 'text-white';
+            iconClass = 'fas fa-exclamation-circle';
+            break;
+          default:
+            bgColor = 'bg-blue-500';
+            textColor = 'text-white';
+            iconClass = 'fas fa-info-circle';
+        }
+
+        toast.className = `flex items-center p-4 rounded-lg shadow-lg ${bgColor} ${textColor} transform transition-all duration-500 ease-in-out translate-x-full opacity-0`;
+        toast.innerHTML = `
+          <i class="${iconClass} mr-3 text-xl"></i>
+          <span class="font-medium">${message}</span>
+          <button class="ml-auto -mx-1.5 -my-1.5 p-1.5 rounded-full hover:bg-white/20 transition-colors">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+
+        toast.querySelector('button').addEventListener('click', () => removeToast(toast));
+        toastContainer.appendChild(toast);
+
+        // Animate in
+        setTimeout(() => {
+          toast.classList.remove('translate-x-full', 'opacity-0');
+        }, 100);
+
+        // Auto-remove after 5 seconds
+        const timeoutId = setTimeout(() => removeToast(toast), 5000);
+        
+        toast.addEventListener('mouseover', () => clearTimeout(timeoutId));
+      }
+
+      function removeToast(toast) {
+        toast.classList.add('opacity-0');
+        toast.style.transform = 'translateX(100%)';
+        toast.addEventListener('transitionend', () => {
+          if (toast.parentNode) {
+            toast.parentNode.removeChild(toast);
+          }
+        });
+      }
+    });
   </script>
 </body>
 </html>
