@@ -24,8 +24,6 @@ def login():
                 session['user'] = data['user']
                 session['logged_in'] = True
                 flash('Inicio de sesión exitoso', 'success')
-                if data['user']['role'] == 'admin':
-                    return redirect(url_for('auth.select_role'))
                 return redirect(url_for('home.index'))
             else:
                 error_data = response.json()
@@ -69,12 +67,6 @@ def register():
             flash('Error de conexión con el servidor', 'error')
     
     return render_template('auth/register.html')
-
-@bp.route('/select_role')
-def select_role():
-    if not session.get('logged_in') or session['user']['role'] != 'admin':
-        return redirect(url_for('home.index'))
-    return render_template('auth/select_role.html')
 
 @bp.route('/logout')
 def logout():
