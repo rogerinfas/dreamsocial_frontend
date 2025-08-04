@@ -68,7 +68,9 @@
       <div class="px-6 pb-6">
         <img src="{{ current_app.config['API_URL'] }}/{{ post.image }}"
              alt="Imagen del post"
-             class="w-full max-h-96 object-cover rounded-lg border border-gray-200">
+             class="w-full max-h-96 object-cover rounded-lg border border-gray-200 cursor-pointer hover:opacity-90 transition duration-200 modal-image"
+             data-image-url="{{ current_app.config['API_URL'] }}/{{ post.image }}"
+             data-caption="{{ post.content[:100] }}...">
       </div>
     {% endif %}
 
@@ -161,4 +163,122 @@
     </div>
   </div>
 </div>
+<!-- Modal para imagen en pantalla completa -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-90 z-50 hidden flex items-center justify-center p-4">
+  <div class="relative max-w-7xl max-h-full w-full h-full flex items-center justify-center">
+    <!-- Botón cerrar -->
+    <button onclick="closeImageModal()"
+            class="absolute top-4 right-4 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2 transition duration-200">
+      <i class="fas fa-times text-2xl"></i>
+    </button>
+    
+    <!-- Imagen -->
+    <img id="modalImage"
+         src=""
+         alt=""
+         class="max-w-full max-h-full object-contain rounded-lg shadow-2xl">
+    
+    <!-- Información del post -->
+    <div class="absolute bottom-4 left-4 right-4 bg-black bg-opacity-70 text-white p-4 rounded-lg">
+      <p id="modalImageCaption" class="text-sm"></p>
+    </div>
+    
+    <!-- Controles adicionales -->
+    <div class="absolute top-4 left-4 flex space-x-2">
+      <button onclick="downloadImage()"
+              class="text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2 transition duration-200"
+              title="Descargar imagen">
+        <i class="fas fa-download"></i>
+      </button>
+      <button onclick="shareImage()"
+              class="text-white hover:text-gray-300 bg-black bg-opacity-50 rounded-full p-2 transition duration-200"
+              title="Compartir imagen">
+        <i class="fas fa-share"></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Variables globales para el modal
+let currentImageUrl = '';
+
+// Función para abrir el modal de imagen
+function openImageModal(imageUrl, caption) {
+  currentImageUrl = imageUrl;
+  const modal = document.getElementById('imageModal');
+  const modalImage = document.getElementById('modalImage');
+  const modalCaption = document.getElementById('modalImageCaption');
+  
+  modalImage.src = imageUrl;
+  modalImage.alt = caption;
+  modalCaption.textContent = caption;
+  
+  modal.classList.remove('hidden');
+  document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+}
+
+// Función para cerrar el modal
+function closeImageModal() {
+  const modal = document.getElementById('imageModal');
+  modal.classList.add('hidden');
+  document.body.style.overflow = 'auto'; // Restaurar scroll del body
+}
+
+// Función para descargar imagen
+function downloadImage() {
+  if (currentImageUrl) {
+    const link = document.createElement('a');
+    link.href = currentImageUrl;
+    link.download = 'dreamsocial-image.jpg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+}
+
+// Función para compartir imagen
+function shareImage() {
+  if (navigator.share && currentImageUrl) {
+    navigator.share({
+      title: 'Imagen de DreamSocial',
+      text: 'Mira esta imagen de DreamSocial',
+      url: currentImageUrl
+    }).catch(console.error);
+  } else {
+    // Fallback: copiar URL al clipboard
+    navigator.clipboard.writeText(currentImageUrl).then(() => {
+      alert('URL de la imagen copiada al portapapeles');
+    }).catch(() => {
+      alert('No se pudo compartir la imagen');
+    });
+  }
+}
+
+// Event listeners para imágenes con clase modal-image
+document.addEventListener('DOMContentLoaded', function() {
+  const modalImages = document.querySelectorAll('.modal-image');
+  modalImages.forEach(function(img) {
+    img.addEventListener('click', function() {
+      const imageUrl = this.getAttribute('data-image-url');
+      const caption = this.getAttribute('data-caption');
+      openImageModal(imageUrl, caption);
+    });
+  });
+});
+
+// Cerrar modal con tecla Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeImageModal();
+  }
+});
+
+// Cerrar modal al hacer clic fuera de la imagen
+document.getElementById('imageModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeImageModal();
+  }
+});
+</script>
 {% endblock %}
