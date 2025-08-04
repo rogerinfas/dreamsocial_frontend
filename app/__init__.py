@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, current_app
 from .routes import home, users, profiles, auth, posts
 from requests.exceptions import ConnectionError, Timeout, RequestException
 import os
@@ -39,6 +39,11 @@ def create_app():
             return date_string.strftime(format)
         else:
             return str(date_string)
+
+    # Hacer current_app disponible en todos los templates
+    @app.context_processor
+    def inject_current_app():
+        return dict(current_app=current_app)
 
     # Registrar blueprints
     app.register_blueprint(home.bp)

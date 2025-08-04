@@ -24,7 +24,7 @@ def create_post():
             flash('El contenido del post es requerido', 'error')
             return render_template('posts/create.html')
         
-        # Preparar datos del formulario
+        # Preparar datos del formulario (sin authorId, se obtiene del JWT)
         form_data = {'content': content}
         
         files = {}
