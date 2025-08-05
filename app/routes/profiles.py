@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, current_app, flash
+from flask import Blueprint, render_template, request, redirect, url_for, current_app, flash, session
 import requests
 from .auth import get_auth_headers, login_required
 
@@ -82,3 +82,60 @@ def view_profile(profile_id):
     posts = posts_resp.json() if posts_resp.status_code == 200 else []
     
     return render_template('profile/detail.html', profile=profile, posts=posts)
+
+@bp.route('/me')
+@login_required
+def my_profile():
+    headers = get_auth_headers()
+    user_id = session['user']['id']
+    
+    # Obtener el perfil del usuario actual
+    profile_resp = requests.get(f"{current_app.config['API_URL']}/profiles/user/{user_id}", headers=headers)
+    
+    if profile_resp.status_code == 404:
+        flash('No tienes un perfil creado. ¡Crea uno ahora!', 'info')
+        return redirect(url_for('profiles.create_profile'))
+    
+    if profile_resp.status_code != 200:
+        flash('Error al obtener tu perfil.', 'error')
+        return redirect(url_for('home.index'))
+        
+    profile = profile_resp.json()
+    
+    # Obtener los posts del usuario
+    posts_resp = requests.get(f"{current_app.config['API_URL']}/posts/user/{user_id}", headers=headers)
+    posts = posts_resp.json() if posts_resp.status_code == 200 else []
+    
+    return render_template('profile/detail.html', profile=profile, posts=posts)
+
+@bp.route('/<int:profile_id>/update', methods=['POST'])
+@login_required
+def update_profile(profile_id):
+    headers = get_auth_headers()
+    
+    form_data = {
+        'firstName': request.form.get('firstName'),
+        'lastName': request.form.get('lastName'),
+    }
+
+    files = {}
+    if 'avatar' in request.files and request.files['avatar'].filename != '':
+        avatar = request.files['avatar']
+        files['avatar'] = (avatar.filename, avatar.stream, avatar.mimetype)
+
+    # Remove content-type from headers for multipart/form-data
+    headers.pop('Content-Type', None)
+
+    response = requests.patch(
+        f"{current_app.config['API_URL']}/profiles/{profile_id}",
+        data=form_data,
+        files=files,
+        headers=headers
+    )
+
+    if response.status_code == 200:
+        flash('Perfil actualizado exitosamente.', 'success')
+    else:
+        flash('Error al actualizar el perfil.', 'error')
+
+    return redirect(url_for('profiles.my_profile'))

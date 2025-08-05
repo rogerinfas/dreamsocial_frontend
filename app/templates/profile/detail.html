@@ -5,12 +5,19 @@
 {% block content %}
 <div class="container mx-auto px-4 py-8">
   <!-- Profile Header -->
-  <div class="bg-white p-6 rounded-lg shadow-md mb-8 flex items-center space-x-6">
-    <img src="{{ url_for('static', filename=profile.avatar if profile.avatar else 'images/default-avatar.png') }}" alt="Avatar" class="w-24 h-24 rounded-full object-cover">
-    <div>
-      <h1 class="text-3xl font-bold text-gray-800">{{ profile.firstName }} {{ profile.lastName }}</h1>
-      <p class="text-gray-500">{{ profile.user.email }}</p>
+  <div class="bg-white p-6 rounded-lg shadow-md mb-8 flex items-center justify-between">
+    <div class="flex items-center space-x-6">
+      <img src="{{ url_for('static', filename=profile.avatar if profile.avatar else 'images/default-avatar.png') }}" alt="Avatar" class="w-24 h-24 rounded-full object-cover">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800">{{ profile.firstName }} {{ profile.lastName }}</h1>
+        <p class="text-gray-500">{{ profile.user.email }}</p>
+      </div>
     </div>
+    {% if session.logged_in and session.user.id == profile.user.id %}
+    <button id="edit-profile-btn" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+      Editar Perfil
+    </button>
+    {% endif %}
   </div>
 
   <!-- User's Posts -->
@@ -33,4 +40,56 @@
     </div>
   </div>
 </div>
+
+{% if session.logged_in and session.user.id == profile.user.id %}
+<!-- Edit Profile Modal -->
+<div id="edit-profile-modal" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center z-50 hidden">
+  <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-4">Editar Perfil</h2>
+    <form action="{{ url_for('profiles.update_profile', profile_id=profile.id) }}" method="POST" enctype="multipart/form-data">
+      <div class="mb-4">
+        <label for="firstName" class="block text-sm font-medium text-gray-700">Nombre</label>
+        <input type="text" name="firstName" id="firstName" value="{{ profile.firstName }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+      </div>
+      <div class="mb-4">
+        <label for="lastName" class="block text-sm font-medium text-gray-700">Apellido</label>
+        <input type="text" name="lastName" id="lastName" value="{{ profile.lastName }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+      </div>
+      <div class="mb-4">
+        <label for="avatar" class="block text-sm font-medium text-gray-700">Avatar</label>
+        <input type="file" name="avatar" id="avatar" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+      </div>
+      <div class="flex justify-end space-x-4">
+        <button type="button" id="cancel-edit-btn" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-400">
+          Cancelar
+        </button>
+        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">
+          Guardar Cambios
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const editProfileBtn = document.getElementById('edit-profile-btn');
+    const editProfileModal = document.getElementById('edit-profile-modal');
+    const cancelEditBtn = document.getElementById('cancel-edit-btn');
+
+    if (editProfileBtn) {
+      editProfileBtn.addEventListener('click', () => {
+        editProfileModal.classList.remove('hidden');
+      });
+    }
+
+    if (cancelEditBtn) {
+      cancelEditBtn.addEventListener('click', () => {
+        editProfileModal.classList.add('hidden');
+      });
+    }
+  });
+</script>
+{% endif %}
+
 {% endblock %}
